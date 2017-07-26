@@ -115,6 +115,34 @@ export class SignaturePad {
         this.signaturePad[option] = value;
     }
   }
+   
+  //check if pointer can be locked
+  public canLockPointer(){
+    return 'pointerLockElement' in document ||
+    'mozPointerLockElement' in document ||
+    'webkitPointerLockElement' in document
+  }
+  
+  //gets raw canvas access, for mouse lock operations and similar
+  public lockPointer(timeout:number): {
+    if(!this.canLockPointer())
+      alert("Pointer Lock API not available");
+    this.signaturePad.requestPointerLock();
+    
+    this.signaturePad.requestPointerLock = this.signaturePad.requestPointerLock ||
+			     this.signaturePad.mozRequestPointerLock ||
+			     this.signaturePad.webkitRequestPointerLock;
+    // Ask the browser to lock the pointer
+    this.signaturePad.requestPointerLock();
+  
+    // Ask the browser to release the pointer
+    document.exitPointerLock = document.exitPointerLock ||
+             document.mozExitPointerLock ||
+             document.webkitExitPointerLock;
+    
+    setTimeout(document.exitPointerLock(), timeout);
+      
+  }
 
   // notify subscribers on signature begin
   public onBegin(): void {
